@@ -1,0 +1,3 @@
+apply from: "$rootProject.projectDir/gradle/publish_github.gradle"
+
+version = LIBRARY_VERSION

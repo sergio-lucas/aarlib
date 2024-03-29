@@ -1,0 +1,75 @@
+apply plugin: 'maven-publish'
+
+afterEvaluate { project ->
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = getRepositoryUrl()
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+                artifact("libs/heresdk-explore-android-4.14.2.0.11535.aar")
+
+                groupId getLibraryGroup()
+                version getLibraryVersion()
+                artifactId getArtifactId()
+
+                // configurePom(pom)
+            }
+        }
+    }
+}
+
+static def getRepositoryUrl() {
+    return "https://maven.pkg.github.com/sergio-lucas/aarlib"
+}
+
+def getLibraryGroup() {
+    return LIBRARY_GROUP ?: project.group
+}
+
+def getLibraryVersion() {
+    return LIBRARY_VERSION ?: "1"
+}
+
+def getArtifactId() {
+    return LIBRARY_ARTIFACT ?: project.name
+}
+
+// def configurePom(pom) {
+//     pom.withXml {
+//         final dependenciesNode = asNode().appendNode('dependencies')
+//         ext.addDependency = { Dependency dep, String scope ->
+//             if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+//                 return
+
+//             final dependencyNode = dependenciesNode.appendNode('dependency')
+//             dependencyNode.appendNode('groupId', dep.group)
+//             dependencyNode.appendNode('artifactId', dep.name)
+//             dependencyNode.appendNode('version', dep.version)
+//             dependencyNode.appendNode('scope', scope)
+
+//             if (!dep.transitive) {
+//                 final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+//                 exclusionNode.appendNode('groupId', '*')
+//                 exclusionNode.appendNode('artifactId', '*')
+//             } else if (!dep.properties.excludeRules.empty) {
+//                 final exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+
+//                 dep.properties.excludeRules.each { ExcludeRule rule ->
+//                     exclusionNode.appendNode('groupId', rule.group ?: '*')
+//                     exclusionNode.appendNode('artifactId', rule.module ?: '*')
+//                 }
+//             }
+//         }
+
+//         configurations.api.getDependencies().each { dep -> addDependency(dep, "compile") }
+//         configurations.implementation.getDependencies().each { dep -> addDependency(dep, "runtime") }
+//     }
+// }
