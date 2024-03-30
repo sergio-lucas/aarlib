@@ -1,0 +1,42 @@
+apply plugin: 'maven-publish'
+
+afterEvaluate { project ->
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = getRepositoryUrl()
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
+            }
+        }
+        publications {
+            gpr(MavenPublication) {
+                artifact("libs/heresdk-explore-android-4.14.2.0.11535.aar")
+
+                groupId getLibraryGroup()
+                version getLibraryVersion()
+                artifactId getArtifactId()
+
+            }
+        }
+    }
+}
+
+static def getRepositoryUrl() {
+    return "https://maven.pkg.github.com/sergio-lucas/aarlib"
+}
+
+def getLibraryGroup() {
+    return LIBRARY_GROUP ?: project.group
+}
+
+def getLibraryVersion() {
+    return LIBRARY_VERSION ?: "1"
+}
+
+def getArtifactId() {
+    return LIBRARY_ARTIFACT ?: project.name
+}
